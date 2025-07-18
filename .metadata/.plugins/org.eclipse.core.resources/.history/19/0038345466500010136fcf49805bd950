@@ -1,0 +1,65 @@
+package conexao_bd;
+
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet(urlPatterns = "/cadastro")
+
+public class ServletLogin extends HttpServlet {
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	String nome = req.getParameter("txtNome");
+	String email = req.getParameter("txtEmail");
+	String senha = req.getParameter("txtSenha");
+	String botao = req.getParameter("botao");
+	Usuario usuario = new Usuario();
+
+	UsuarioBanco banco = new UsuarioBanco();
+
+	if ("Logar".equals(botao)) {
+		if (email == null || senha == null || senha.length() < 4) {
+			req.setAttribute("error", true);
+			req.setAttribute("msg", "Email ou senha incorretos");
+			req.getRequestDispatcher("index.jsp").forward(req, resp);
+			return;
+		}
+
+	Usuario usuarioLogado = banco.login(email, senha);
+		if (usuarioLogado != null) {
+			resp.sendRedirect("dashboard.jsp");
+			return;
+		} else {
+			req.setAttribute("error", true);
+			req.setAttribute("msg", "Email ou senha incorretos");
+			req.getRequestDispatcher("index.jsp").forward(req, resp);
+			return;
+			}
+	} else if ("Cadastrar".equals(botao)) {
+		if (nome == null || email == null || senha == null || senha.length() < 4) {
+			req.setAttribute("error", true);
+			req.setAttribute("msg", "Incorreto, a senha deve ter no mínimo 4 caracteres");
+			req.getRequestDispatcher("dashboard.jsp").forward(req, resp);
+			return;
+			}
+
+		usuario.setNome(nome);
+		usuario.setEmail(email);
+		usuario.setSenha(senha);
+
+		boolean sucesso = banco.inserir(usuario);
+		if (sucesso) {
+			resp.sendRedirect("index.jsp");
+			return;
+		} else {
+			req.setAttribute("error", true);
+			req.setAttribute("msg", "Erro ao cadastrar.");
+			req.getRequestDispatcher("dashboard.jsp").forward(req, resp);
+			return;
+			}
+		}
+	}
+}

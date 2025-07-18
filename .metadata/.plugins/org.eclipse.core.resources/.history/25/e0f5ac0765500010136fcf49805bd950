@@ -1,0 +1,100 @@
+package conexao_bd;
+
+import java.io.IOException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet(urlPatterns = "/cadastro")
+public class ServletLogin extends HttpServlet {
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		String nome = req.getParameter("txtNome");
+		String email = req.getParameter("txtEmail");
+		String senha = req.getParameter("txtSenha");
+		String botao = req.getParameter("botao");
+
+		// Instancie UsuarioBanco uma vez para ser usado em ambos os fluxos
+		UsuarioBanco banco = new UsuarioBanco();
+
+		if ("Logar".equals(botao)) {
+			// Validação para campos vazios no login
+			if (email == null || email.trim().isEmpty() || senha == null || senha.trim().isEmpty()) {
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Email e senha não podem estar vazios.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp);
+				return;
+			}
+            // A validação de 'senha.length() < 4' aqui é menos comum para login,
+            // mas se você quer mantê-la como um requisito para ambas as ações:
+            if (senha.length() < 4) {
+                req.setAttribute("error", true);
+                req.setAttribute("msg", "Email ou senha incorretos."); // Mensagem genérica para segurança
+                req.getRequestDispatcher("index.jsp").forward(req, resp);
+                return;
+            }
+
+
+			Usuario usuarioLogado = banco.login(email, senha);
+
+			if (usuarioLogado != null) {
+				// Login bem-sucedido
+				// Você pode armazenar o usuário na sessão aqui se precisar dele em outras páginas
+				// req.getSession().setAttribute("usuarioLogado", usuarioLogado); 
+				resp.sendRedirect("dashboard.jsp");
+				return;
+			} else {
+				// Login falhou
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Email ou senha incorretos.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp); // Encaminha para index.jsp para mostrar erro
+				return;
+			}
+		} else if ("Cadastrar".equals(botao)) {
+			// Validação de campos para cadastro
+			if (nome == null || nome.trim().isEmpty() || email == null || email.trim().isEmpty() || senha == null || senha.length() < 4) {
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Para cadastrar, nome, email e senha são obrigatórios. A senha deve ter no mínimo 4 caracteres.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp); // Encaminha para index.jsp para mostrar erro
+				return;
+			}
+
+            // Opcional: Verificar se o email já existe (se você tiver esse método no UsuarioBanco)
+            // if (banco.emailExiste(email)) {
+            //     req.setAttribute("error", true);
+            //     req.setAttribute("msg", "Este email já está cadastrado.");
+            //     req.getRequestDispatcher("index.jsp").forward(req, resp);
+            //     return;
+            // }
+
+			Usuario novoUsuario = new Usuario();
+			novoUsuario.setNome(nome);
+			novoUsuario.setEmail(email);
+			novoUsuario.setSenha(senha); // Lembre-se: Em produção, a senha deve ser criptografada aqui ANTES de chamar banco.inserir()
+
+			boolean sucesso = banco.inserir(novoUsuario);
+
+			if (sucesso) {
+				// Cadastro bem-sucedido: Redireciona para o login (presumindo que index.jsp é o login)
+				// Não definimos mensagem com req.setAttribute aqui, pois é um sendRedirect.
+				// Se quisesse uma mensagem, precisaria de HttpSession (contrário ao seu padrão atual para erros)
+				resp.sendRedirect("index.jsp"); 
+				return;
+			} else {
+				// Erro no cadastro (ex: problema no banco de dados)
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Erro ao cadastrar. Tente novamente mais tarde.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp); // Encaminha para index.jsp para mostrar erro
+				return;
+			}
+		}
+        // Fallback para requisições que não são de "Logar" nem "Cadastrar"
+        req.setAttribute("error", true);
+        req.setAttribute("msg", "Ação inválida.");
+        req.getRequestDispatcher("index.jsp").forward(req, resp);
+	}
+}

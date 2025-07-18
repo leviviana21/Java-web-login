@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login/Cadastro</title>
+    <style>
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+        .success-message {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bem-vindo! Faça Login ou Cadastre-se</h1>
+
+    <%
+        HttpSession currentSession = request.getSession(false); 
+        String errorMessage = null;
+        String successMessage = null;
+
+        if (currentSession != null) {
+            errorMessage = (String) currentSession.getAttribute("mensagemErro");
+            successMessage = (String) currentSession.getAttribute("mensagemSucesso");
+
+            currentSession.removeAttribute("mensagemErro");
+            currentSession.removeAttribute("mensagemSucesso");
+        }
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            out.println("<p class='error-message'>" + errorMessage + "</p>");
+        }
+
+        if (successMessage != null && !successMessage.isEmpty()) {
+            out.println("<p class='success-message'>" + successMessage + "</p>");
+        }
+    %>
+
+    <hr>
+
+    <h2>Login</h2>
+    <form action="cadastro" method="post">
+        <label for="txtEmailLogin">Email:</label><br>
+        <input type="text" id="txtEmailLogin" name="txtEmail"><br><br>
+        <label for="txtSenhaLogin">Senha:</label><br>
+        <input type="password" id="txtSenhaLogin" name="txtSenha"><br><br>
+        <input type="submit" name="botao" value="Logar">
+    </form>
+
+    <hr>
+
+    <h2>Cadastro</h2>
+    <form action="cadastro" method="post">
+        <label for="txtNomeCadastro">Nome:</label><br>
+        <input type="text" id="txtNomeCadastro" name="txtNome"><br><br>
+        <label for="txtEmailCadastro">Email:</label><br>
+        <input type="text" id="txtEmailCadastro" name="txtEmail"><br><br>
+        <label for="txtSenhaCadastro">Senha:</label><br>
+        <input type="password" id="txtSenhaCadastro" name="txtSenha"><br><br>
+        <input type="submit" name="botao" value="Cadastrar">
+    </form>
+
+</body>
+</html>

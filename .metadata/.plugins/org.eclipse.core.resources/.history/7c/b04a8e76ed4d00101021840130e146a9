@@ -1,0 +1,38 @@
+package conexao_bd;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class UsuarioBanco {
+	public Usuario login (String email, String senha) {
+		Connection conn = null;
+		try {
+			conn = new Conexao().getConexao(); //abre conexão com o banco
+			String sql = "insert into dados (email, senha, nome) "
+					+ " values (?, ?, ?)";
+			PreparedStatement ps = conn.prepareStatement(sql); //prepara o sql
+			ps.setString(1, Usuario.getEmail()); // substitui o primeiro ? pelo email
+			ps.setString(2, senha); // substitui o segundo ? pela senha
+			
+			ResultSet rs = ps.executeQuery(); //executa a consulta
+			
+			if (rs.next()) {// se encontrar o resultado, retorna objeto com os dados preenchidos
+				Usuario u = new Usuario();
+				u.setId(rs.getInt("id"));
+				u.setIdade(rs.getInt("idade"));
+				u.setNome(rs.getString("nome"));
+				u.setSexo(rs.getString("sexo"));
+				u.setEmail(rs.getString("email"));
+				u.setSenha(rs.getString("senha"));
+				return u;
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace(); //caso tenha, mostra o erro
+		} finally {
+			new Conexao().fechar(conn); //se não encontrou usuário, retorna null
+		}
+		return null;
+	}
+}

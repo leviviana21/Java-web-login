@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;conexao_bd/src/main/webapp/tela_cadastro.jsp&apos; to &apos;dashboard.jsp&apos;" description="Rename resource &apos;tela_cadastro.jsp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/main/webapp/tela_cadastro.jsp" name="dashboard.jsp" stamp="1750375292545" updateReferences="true"/>
+</session>

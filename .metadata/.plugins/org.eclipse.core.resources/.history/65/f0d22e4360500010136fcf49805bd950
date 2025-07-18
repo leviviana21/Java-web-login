@@ -1,0 +1,50 @@
+package conexao_bd;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class UsuarioBanco {
+	public boolean inserir (Usuario usuario) {
+		Connection conn = null;
+		try {
+			conn = new Conexao().getConexao(); //abre conexão com o banco
+			String sql = "insert into dados (email, senha, nome) "
+					+ " values (?, ?, ?)";
+			PreparedStatement ps = conn.prepareStatement(sql); //prepara o sql
+			ps.setString(1, usuario.getEmail()); // substitui o primeiro ? pelo email
+			ps.setString(2, usuario.getSenha());
+			ps.setString(3, usuario.getNome());
+			ps.execute();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace(); //caso tenha, mostra o erro
+			return false;
+		} finally {
+			new Conexao().fechar(conn); //se não encontrou usuário, retorna null
+		}
+	}
+	
+	public Usuario login(String email, String senha) {
+	    try {
+	        Connection conn = new Conexao().getConexao();
+	        String sql = "SELECT * FROM usuarios WHERE email = ? AND senha = ?";
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setString(1, email);
+	        ps.setString(2, senha);
+	        ResultSet rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            Usuario u = new Usuario();
+	            u.setNome(rs.getString("nome"));
+	            u.setEmail(rs.getString("email"));
+	            u.setSenha(rs.getString("senha"));
+	            return u;
+	        }
+
+	        conn.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}

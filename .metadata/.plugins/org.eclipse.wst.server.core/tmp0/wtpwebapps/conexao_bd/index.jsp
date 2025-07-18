@@ -1,0 +1,34 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+	<form action="cadastro" method="post">
+        <h1>Login</h1>
+        <label>Digite o seu e-mail: </label>
+        <input type="email" name="txtEmail" class="emailsenha" >
+        <br>
+        <label>Digite a sua senha: </label>
+        <input type="password" name="txtSenha" class="emailsenha" >
+        <br>
+        <input type="submit" value="Logar" name="botao" class="botao-login">
+		<input type="button" value="Cadastrar" class="botao-login" onclick="window.location.href='dashboard.jsp'">
+        
+        <%
+			if(request.getAttribute("error") != null){
+		%>
+		<p class="aviso-erro"><% out.print(request.getAttribute("msg").toString()); %></p>
+		<%
+			}
+		%>
+    </form>
+</div>
+</body>
+</html>

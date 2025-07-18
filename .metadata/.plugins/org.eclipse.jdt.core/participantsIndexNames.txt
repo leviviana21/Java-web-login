@@ -1,0 +1,5 @@
+INDEX VERSION 1.134
+C:\Users\Usuario\Desktop\java_conexao\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1546249163.index
+\conexao_bd\src\main\java
+D:\2025\IFSP\DSW\java_conexao\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1546249163.index
+\conexao_bd\src\main\java

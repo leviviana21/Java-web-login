@@ -1,0 +1,77 @@
+package conexao_bd;
+
+import java.io.IOException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet(urlPatterns = "/cadastro")
+public class ServletLogin extends HttpServlet {
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		String nome = req.getParameter("txtNome");
+		String email = req.getParameter("txtEmail");
+		String senha = req.getParameter("txtSenha");
+		String botao = req.getParameter("botao");
+
+		UsuarioBanco banco = new UsuarioBanco();
+
+		if ("Logar".equals(botao)) {
+			if (email == null || email.trim().isEmpty() || senha == null || senha.trim().isEmpty()) {
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Email e senha não podem estar vazios.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp);
+				return;
+			}
+            if (senha.length() < 4) {
+                req.setAttribute("error", true);
+                req.setAttribute("msg", "Email ou senha incorretos.");
+                req.getRequestDispatcher("index.jsp").forward(req, resp);
+                return;
+            }
+
+
+			Usuario usuarioLogado = banco.login(email, senha);
+
+			if (usuarioLogado != null) {
+				resp.sendRedirect("dashboard.jsp");
+				return;
+			} else {
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Email ou senha incorretos.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp);
+				return;
+			}
+		} else if ("Cadastrar".equals(botao)) {
+			if (nome == null || nome.trim().isEmpty() || email == null || email.trim().isEmpty() || senha == null || senha.length() < 4) {
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Para cadastrar, nome, email e senha são obrigatórios. A senha deve ter no mínimo 4 caracteres.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp);
+				return;
+			}
+			Usuario novoUsuario = new Usuario();
+			novoUsuario.setNome(nome);
+			novoUsuario.setEmail(email);
+			novoUsuario.setSenha(senha);
+
+			boolean sucesso = banco.inserir(novoUsuario);
+
+			if (sucesso) {
+				resp.sendRedirect("index.jsp"); 
+				return;
+			} else {
+				req.setAttribute("error", true);
+				req.setAttribute("msg", "Erro ao cadastrar. Tente novamente mais tarde.");
+				req.getRequestDispatcher("index.jsp").forward(req, resp); 
+				return;
+			}
+		}
+        req.setAttribute("error", true);
+        req.setAttribute("msg", "Ação inválida.");
+        req.getRequestDispatcher("index.jsp").forward(req, resp);
+	}
+}

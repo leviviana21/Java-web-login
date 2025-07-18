@@ -1,0 +1,7 @@
+INDEX VERSION 1.134+D:\2025\IFSP\DSW\java_conexao\.metadata\.plugins\org.eclipse.jdt.core
+3628855125.index
+2211812388.index
+4155642747.index
+3864276271.index
+1865797976.index
+683931521.index

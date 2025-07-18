@@ -1,0 +1,68 @@
+package conexao_bd;
+
+import java.io.IOException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet (urlPatterns = "/cadastro")
+public class ServletLogin extends HttpServlet {
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	    
+	    String nome = req.getParameter("txtNome");
+	    String email = req.getParameter("txtEmail");
+	    String senha = req.getParameter("txtSenha");
+	    String botao = req.getParameter("botao");
+	    
+	    UsuarioBanco dao = new UsuarioBanco();
+
+	    if ("Logar".equals(botao)) {
+	        if (email == null || senha == null || senha.length() < 4) {
+	            req.setAttribute("error", true);
+	            req.setAttribute("msg", "email ou senha inválidos");
+	            req.getRequestDispatcher("index.jsp").forward(req, resp);
+	            return;
+	        }
+	        Usuario usuarioLogado = dao.login(email, senha);
+	        if (usuarioLogado != null) {
+	            req.getSession().setAttribute("usuario", usuarioLogado);
+	            resp.sendRedirect("dashboard.jsp");
+	        } else {
+	            req.setAttribute("error", true);
+	            req.setAttribute("msg", "Email ou senha incorretos");
+	            req.getRequestDispatcher("index.jsp").forward(req, resp);
+	        }
+	        return;
+	    } 
+	    
+	    else if ("Cadastrar".equals(botao)) {
+	        if (email == null || senha == null || senha.length() < 4) {
+	            req.setAttribute("error", true);
+	            req.setAttribute("msg", "para cadastrar, a senha deve ter pelo menos 4 caracteres");
+	            req.getRequestDispatcher("index.jsp").forward(req, resp);
+	            return;
+	        }
+	        Usuario usuario = new Usuario();
+	        usuario.setNome(nome);
+	        usuario.setEmail(email);
+	        usuario.setSenha(senha);
+	        
+	        boolean sucesso = dao.inserir(usuario);
+	        if (sucesso) {
+	            resp.sendRedirect("index.jsp");
+	        } else {
+	            req.setAttribute("error", true);
+	            req.setAttribute("msg", "Erro ao cadastrar usuário");
+	            req.getRequestDispatcher("index.jsp").forward(req, resp);
+	        }
+	        return;
+	    }
+
+	    // Caso o botão não seja reconhecido:
+	    resp.sendRedirect("index.jsp");
+	}
+}

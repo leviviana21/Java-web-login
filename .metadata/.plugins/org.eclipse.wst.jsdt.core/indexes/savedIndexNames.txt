@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+D:\2025\IFSP\DSW\java_conexao\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+3864276271.index
+3097438354.index
+3981603519.index
+3974177875.index
+2751410941.index
+86740536.index
